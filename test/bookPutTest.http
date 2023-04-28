@@ -1,0 +1,8 @@
+PUT http://localhost:8080/books/5 HTTP/1.1
+content-type: application/json
+
+{
+    "title": "星の王子さま23",
+    "author": "サン＝テグジュベリ",
+    "overview": "王子様がいろんな星を旅したら蛇に噛まれて消えました。"
+}
