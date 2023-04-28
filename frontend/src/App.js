@@ -1,5 +1,6 @@
 import "./App.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 function App() {
   const [bookNames, setBookNames] = useState([
@@ -9,6 +10,16 @@ function App() {
   const [inputValue, setInputValue] = useState();
   const [selectedIndex, setSelectedIndex] = useState();
   const [showsEdit, setShowsEdit] = useState(false);
+
+  useEffect(() => {
+    fetchBooksData();
+  });
+
+  const fetchBooksData = () => {
+    axios.get("http://localhost:8080/books").then((response) => {
+      setBookNames(response.data);
+    });
+  };
 
   const handleSubmit = () => {
     setBookNames([...bookNames, inputValue]);
