@@ -3,53 +3,112 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 function App() {
-  const [bookNames, setBookNames] = useState([
-    "react for beginner",
-    "Laravel for beginner",
-  ]);
-  const [inputValue, setInputValue] = useState();
-  const [selectedIndex, setSelectedIndex] = useState();
+  const emptyInput = {
+    title: "",
+    author: "",
+    overview: "",
+  };
+
+  const [books, setBooks] = useState([]);
+  const [inputValues, setInputValues] = useState(emptyInput);
+  const [selectedId, setSelectedId] = useState();
   const [showsEdit, setShowsEdit] = useState(false);
 
   useEffect(() => {
     fetchBooksData();
-  });
+  }, []);
 
+  /**
+   * Fetches data of books from the server and sets the book names to the state.
+   * @returns {void}
+   */
   const fetchBooksData = () => {
     axios.get("http://localhost:8080/books").then((response) => {
-      setBookNames(response.data);
+      setBooks(response.data);
     });
   };
 
-  const handleSubmit = () => {
-    setBookNames([...bookNames, inputValue]);
-    setInputValue("");
+  /**
+   * Posts book data to the server.
+   *
+   * @return {Promise} A Promise that resolves with the server's response data.
+   */
+  const postBookData = () => {
+    return axios.post("http://localhost:8080/books", inputValues);
   };
-  const handleRemove = (index) => {
-    const newBookNames = [...bookNames];
-    newBookNames.splice(index, 1);
-    setBookNames(newBookNames);
+
+  const deleteBookData = (id) => {
+    return axios.delete(`http://localhost:8080/books/${id}`);
   };
-  const handleEdit = (index) => {
+
+  const putBookData = (id) => {
+    return axios.put(`http://localhost:8080/books/${id}`, inputValues);
+  };
+
+  /**
+   * Adds the current input value to the list of book names, and resets the input field.
+   * @function handleSubmit
+   */
+  const handleSubmit = async () => {
+    postBookData()
+      .then(fetchBooksData)
+      .finally(() => {
+        setInputValues(emptyInput);
+      });
+  };
+
+  /**
+   * Remove a book from the collection and update the list of books.
+   *
+   * @param {number} id - The index of the book to remove.
+   * @returns {void}
+   */
+
+  const handleRemove = (id) => {
+    deleteBookData(id).then(fetchBooksData);
+  };
+  const handleEdit = (book) => {
     setShowsEdit(true);
-    setSelectedIndex(index);
-    setInputValue(bookNames[index]);
+    setSelectedId(book.id);
+    setInputValues(book);
   };
   const completeEdit = () => {
-    setShowsEdit(false);
-    setInputValue("");
-    bookNames[selectedIndex] = inputValue;
+    putBookData(selectedId).then(() => {
+      setShowsEdit(false);
+      setInputValues(emptyInput);
+      fetchBooksData();
+    });
   };
 
   return (
     <div>
       <h1>Welcome to Book Store!!</h1>
       <div>
+        <span>タイトル</span>
         <input
           type="text"
-          value={inputValue}
-          onInput={(e) => setInputValue(e.target.value)}
+          value={inputValues.title}
+          onInput={(e) =>
+            setInputValues({ ...inputValues, title: e.target.value })
+          }
         />
+        <span>著者</span>
+        <input
+          type="text"
+          value={inputValues.author}
+          onInput={(e) =>
+            setInputValues({ ...inputValues, author: e.target.value })
+          }
+        />
+        <span>概要</span>
+        <input
+          type="text"
+          value={inputValues.overview}
+          onInput={(e) =>
+            setInputValues({ ...inputValues, overview: e.target.value })
+          }
+        />
+        {showsEdit}
         {showsEdit ? (
           <button onClick={completeEdit}>complete editing</button>
         ) : (
@@ -57,11 +116,13 @@ function App() {
         )}
       </div>
       <ul>
-        {bookNames.map((bookName, index) => (
-          <li key={index}>
-            <button onClick={() => handleEdit(index)}>edit</button>
-            <span>{bookName}</span>
-            <span onClick={() => handleRemove(index)}> X</span>
+        {books.map((book) => (
+          <li key={book.id}>
+            <button onClick={() => handleEdit(book)}>edit</button>
+            <span>{book.title}</span>
+            <span>{book.author}</span>
+            <span>{book.overview}</span>
+            <span onClick={() => handleRemove(book.id)}> X</span>
           </li>
         ))}
       </ul>
