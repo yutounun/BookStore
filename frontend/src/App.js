@@ -158,43 +158,45 @@ function App() {
         </Stack>
       </Stack>
 
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Title</TableCell>
-              <TableCell>Author</TableCell>
-              <TableCell>OverView</TableCell>
-              <TableCell>CreatedAt</TableCell>
-              <TableCell>Edit</TableCell>
-              <TableCell>Remove</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {books.map((book) => (
-              <TableRow
-                key={book.name}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  {book.title}
-                </TableCell>
-                <TableCell>{book.author}</TableCell>
-                <TableCell>{book.overview}</TableCell>
-                <TableCell>{book.created_at}</TableCell>
-                <TableCell>
-                  <EditIcon onClick={() => handleEdit(book)}>edit</EditIcon>
-                </TableCell>
-                <TableCell>
-                  <RemoveCircleOutlineIcon
-                    onClick={() => handleRemove(book.id)}
-                  ></RemoveCircleOutlineIcon>
-                </TableCell>
+      <Stack alignItems="center" mt={3} mb={5}>
+        <TableContainer component={Paper} style={{ width: "70%" }}>
+          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Title</TableCell>
+                <TableCell>Author</TableCell>
+                <TableCell>OverView</TableCell>
+                <TableCell>CreatedAt</TableCell>
+                <TableCell>Edit</TableCell>
+                <TableCell>Remove</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {books.map((book) => (
+                <TableRow
+                  key={book.name}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    {book.title}
+                  </TableCell>
+                  <TableCell>{book.author}</TableCell>
+                  <TableCell>{book.overview}</TableCell>
+                  <TableCell>{book.created_at}</TableCell>
+                  <TableCell>
+                    <EditIcon onClick={() => handleEdit(book)}>edit</EditIcon>
+                  </TableCell>
+                  <TableCell>
+                    <RemoveCircleOutlineIcon
+                      onClick={() => handleRemove(book.id)}
+                    ></RemoveCircleOutlineIcon>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Stack>
     </>
   );
 }
