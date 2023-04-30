@@ -39,7 +39,7 @@ function App() {
    * @returns {void}
    */
   const fetchBooksData = () => {
-    axios.get("http://localhost:8080/books").then((response) => {
+    axios.get(`${process.env.REACT_APP_API_URL}/books`).then((response) => {
       setBooks(response.data);
     });
   };
@@ -50,15 +50,18 @@ function App() {
    * @return {Promise} A Promise that resolves with the server's response data.
    */
   const postBookData = () => {
-    return axios.post("http://localhost:8080/books", inputValues);
+    return axios.post(`${process.env.REACT_APP_API_URL}/books", inputValues`);
   };
 
   const deleteBookData = (id) => {
-    return axios.delete(`http://localhost:8080/books/${id}`);
+    return axios.delete(`${process.env.REACT_APP_API_URL}/books/${id}`);
   };
 
   const putBookData = (id) => {
-    return axios.put(`http://localhost:8080/books/${id}`, inputValues);
+    return axios.put(
+      `${process.env.REACT_APP_API_URL}/books/${id}`,
+      inputValues
+    );
   };
 
   /**
@@ -101,7 +104,7 @@ function App() {
       <Stack alignItems="center" mt={3} mb={5}>
         <Stack direction="row" itemsAlign="center" justifyContent="center">
           <Typography variant="h3" justifyContent="center" itemAligns="center">
-            Book Store
+            Book Store{process.env.APP_URL}
           </Typography>
           <ImportContactsIcon fontSize="large"></ImportContactsIcon>
         </Stack>
@@ -172,27 +175,31 @@ function App() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {books.map((book) => (
-                <TableRow
-                  key={book.name}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell component="th" scope="row">
-                    {book.title}
-                  </TableCell>
-                  <TableCell>{book.author}</TableCell>
-                  <TableCell>{book.overview}</TableCell>
-                  <TableCell>{book.created_at}</TableCell>
-                  <TableCell>
-                    <EditIcon onClick={() => handleEdit(book)}>edit</EditIcon>
-                  </TableCell>
-                  <TableCell>
-                    <RemoveCircleOutlineIcon
-                      onClick={() => handleRemove(book.id)}
-                    ></RemoveCircleOutlineIcon>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {books
+                ? books.map((book) => (
+                    <TableRow
+                      key={book.name}
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    >
+                      <TableCell component="th" scope="row">
+                        {book.title}
+                      </TableCell>
+                      <TableCell>{book.author}</TableCell>
+                      <TableCell>{book.overview}</TableCell>
+                      <TableCell>{book.created_at}</TableCell>
+                      <TableCell>
+                        <EditIcon onClick={() => handleEdit(book)}>
+                          edit
+                        </EditIcon>
+                      </TableCell>
+                      <TableCell>
+                        <RemoveCircleOutlineIcon
+                          onClick={() => handleRemove(book.id)}
+                        ></RemoveCircleOutlineIcon>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                : "a"}
             </TableBody>
           </Table>
         </TableContainer>

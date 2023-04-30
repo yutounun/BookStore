@@ -3,7 +3,8 @@ import cors from "cors";
 
 const app = express();
 const corsOptions = {
-  origin: "http://localhost:8000", // 許可したいオリジンを指定
+  origin:
+    "http://https://644cd7cf587f9e6ff847a7c5--relaxed-horse-0f6752.netlify.app/", // 許可したいオリジンを指定
   credentials: true, // レスポンスヘッダーにAccess-Control-Allow-Credentialsを追加。ユーザー認証等を行う場合は、これがないとブラウザがレスポンスを捨ててしまうそう。
   optionsSuccessStatus: 200, // レスポンスのHTTPステータスコードを「200(成功)」に設定
 };
