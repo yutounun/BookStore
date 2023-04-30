@@ -50,7 +50,7 @@ function App() {
    * @return {Promise} A Promise that resolves with the server's response data.
    */
   const postBookData = () => {
-    return axios.post(`${process.env.REACT_APP_API_URL}/books", inputValues`);
+    return axios.post(`${process.env.REACT_APP_API_URL}/books`, inputValues);
   };
 
   const deleteBookData = (id) => {
