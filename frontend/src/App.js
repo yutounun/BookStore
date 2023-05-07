@@ -15,6 +15,7 @@ import {
   TableBody,
   Paper,
   Typography,
+  CircularProgress,
 } from "@mui/material";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 
@@ -29,9 +30,13 @@ function App() {
   const [inputValues, setInputValues] = useState(emptyInput);
   const [selectedId, setSelectedId] = useState();
   const [showsEdit, setShowsEdit] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    fetchBooksData();
+    setIsLoading(true);
+    fetchBooksData().finally(() => {
+      setIsLoading(false);
+    });
   }, []);
 
   /**
@@ -39,9 +44,11 @@ function App() {
    * @returns {void}
    */
   const fetchBooksData = () => {
-    axios.get(`${process.env.REACT_APP_API_URL}/books`).then((response) => {
-      setBooks(response.data);
-    });
+    return axios
+      .get(`${process.env.REACT_APP_API_URL}/books`)
+      .then((response) => {
+        setBooks(response.data);
+      });
   };
 
   /**
@@ -69,10 +76,12 @@ function App() {
    * @function handleSubmit
    */
   const handleSubmit = async () => {
+    setIsLoading(true);
     postBookData()
       .then(fetchBooksData)
       .finally(() => {
         setInputValues(emptyInput);
+        setIsLoading(false);
       });
   };
 
@@ -92,19 +101,25 @@ function App() {
     setInputValues(book);
   };
   const completeEdit = () => {
-    putBookData(selectedId).then(() => {
-      setShowsEdit(false);
-      setInputValues(emptyInput);
-      fetchBooksData();
-    });
+    setIsLoading(true);
+    putBookData(selectedId)
+      .then(() => {
+        setShowsEdit(false);
+        setInputValues(emptyInput);
+        fetchBooksData();
+      })
+      .finally(() => {
+        setIsLoading(true);
+      });
   };
+  const msg = "aa";
 
   return (
     <>
       <Stack alignItems="center" mt={3} mb={5}>
         <Stack direction="row" itemsAlign="center" justifyContent="center">
           <Typography variant="h3" justifyContent="center" itemAligns="center">
-            Book Store{process.env.APP_URL}
+            Book Store{isLoading}
           </Typography>
           <ImportContactsIcon fontSize="large"></ImportContactsIcon>
         </Stack>
@@ -154,7 +169,7 @@ function App() {
                 variant="contained"
                 onClick={handleSubmit}
               >
-                Add Book
+                Add Book{showsEdit}
               </Button>
             )}
           </Stack>
@@ -162,47 +177,53 @@ function App() {
       </Stack>
 
       <Stack alignItems="center" mt={3} mb={5}>
-        <TableContainer component={Paper} style={{ width: "70%" }}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Title</TableCell>
-                <TableCell>Author</TableCell>
-                <TableCell>OverView</TableCell>
-                <TableCell>CreatedAt</TableCell>
-                <TableCell>Edit</TableCell>
-                <TableCell>Remove</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {books
-                ? books.map((book) => (
-                    <TableRow
-                      key={book.name}
-                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                    >
-                      <TableCell component="th" scope="row">
-                        {book.title}
-                      </TableCell>
-                      <TableCell>{book.author}</TableCell>
-                      <TableCell>{book.overview}</TableCell>
-                      <TableCell>{book.created_at}</TableCell>
-                      <TableCell>
-                        <EditIcon onClick={() => handleEdit(book)}>
-                          edit
-                        </EditIcon>
-                      </TableCell>
-                      <TableCell>
-                        <RemoveCircleOutlineIcon
-                          onClick={() => handleRemove(book.id)}
-                        ></RemoveCircleOutlineIcon>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                : "a"}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        {isLoading ? (
+          <CircularProgress color="secondary" />
+        ) : (
+          <TableContainer component={Paper} style={{ width: "70%" }}>
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Title</TableCell>
+                  <TableCell>Author</TableCell>
+                  <TableCell>OverView</TableCell>
+                  <TableCell>CreatedAt</TableCell>
+                  <TableCell>Edit</TableCell>
+                  <TableCell>Remove</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {books
+                  ? books.map((book) => (
+                      <TableRow
+                        key={book.name}
+                        sx={{
+                          "&:last-child td, &:last-child th": { border: 0 },
+                        }}
+                      >
+                        <TableCell component="th" scope="row">
+                          {book.title}
+                        </TableCell>
+                        <TableCell>{book.author}</TableCell>
+                        <TableCell>{book.overview}</TableCell>
+                        <TableCell>{book.created_at}</TableCell>
+                        <TableCell>
+                          <EditIcon onClick={() => handleEdit(book)}>
+                            edit
+                          </EditIcon>
+                        </TableCell>
+                        <TableCell>
+                          <RemoveCircleOutlineIcon
+                            onClick={() => handleRemove(book.id)}
+                          ></RemoveCircleOutlineIcon>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  : "a"}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </Stack>
     </>
   );
