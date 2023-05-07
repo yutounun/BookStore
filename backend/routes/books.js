@@ -2,6 +2,26 @@ const { PrismaClient } = require("@prisma/client");
 
 var express = require("express");
 var router = express.Router();
+const jwtToken = require("jsonwebtoken");
+var { expressjwt: jwt } = require("express-jwt");
+
+SECRET_KEY = "mysecretkey";
+
+/** login using JWT */
+router.post("/login", (req, res) => {
+  const { username, password } = req.body;
+
+  if (username === "user" && password === "password") {
+    const token = jwtToken.sign({ userId: 1, username }, SECRET_KEY, {
+      expiresIn: "1h",
+    });
+    res.json({ token });
+  } else {
+    res.status(401).send("Invalid credentials2");
+  }
+});
+
+const verifyJwt = jwt({ secret: SECRET_KEY, algorithms: ["HS256"] });
 
 /* GET books listing. */
 router.get("/", async (req, res) => {
@@ -59,7 +79,7 @@ router.put("/:id", async (req, res) => {
 });
 
 /** GET BY ID book */
-router.get("/:id", async (req, res) => {
+router.get("/:id", verifyJwt, async (req, res) => {
   const prisma = new PrismaClient();
   try {
     const book = await prisma.books.findUnique({
